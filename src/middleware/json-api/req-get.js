@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: 'GET',
   req: (payload) => {
     if (payload.req.method === 'GET') {

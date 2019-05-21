@@ -1,4 +1,4 @@
-const Minilog = require('minilog')
+import Minilog from 'minilog'
 
 class Logger {
   static debug (message) {
@@ -34,4 +34,4 @@ class Logger {
   }
 }
 
-module.exports = Logger
+export default Logger

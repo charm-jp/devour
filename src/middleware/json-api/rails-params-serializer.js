@@ -1,6 +1,6 @@
-const Qs = require('qs')
+import Qs from 'qs'
 
-module.exports = {
+export default {
   name: 'rails-params-serializer',
   req: (payload) => {
     if (payload.req.method === 'GET') {

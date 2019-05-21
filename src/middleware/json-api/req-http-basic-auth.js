@@ -1,9 +1,9 @@
-const _isEmpty = require('lodash/isEmpty')
+import {isEmpty} from 'lodash-es'
 
-module.exports = {
+export default {
   name: 'HTTP_BASIC_AUTH',
   req: (payload) => {
-    if (!_isEmpty(payload.jsonApi.auth)) {
+    if (!isEmpty(payload.jsonApi.auth)) {
       payload.req.auth = payload.jsonApi.auth
     }
     return payload

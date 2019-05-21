@@ -1,18 +1,8 @@
-const _forOwn = require('lodash/forOwn')
-const _isArray = require('lodash/isArray')
-const _isUndefined = require('lodash/isUndefined')
-const _isPlainObject = require('lodash/isPlainObject')
-const _includes = require('lodash/includes')
-const _find = require('lodash/find')
-const _get = require('lodash/get')
-const _map = require('lodash/map')
-const _filter = require('lodash/filter')
-const _matches = require('lodash/matches')
-const _flatten = require('lodash/flatten')
+import {forOwn, isArray, isUndefined, isPlainObject, includes, find, get, map, filter, matches, flatten} from 'lodash-es'
 
-const Logger = require('../../logger')
+import Logger from '../../logger'
 
-const cache = new class {
+export const cache = new class {
   constructor () { this._cache = [] }
 
   set (type, id, deserializedData) {
@@ -24,7 +14,7 @@ const cache = new class {
   }
 
   get (type, id) {
-    const match = _find(this._cache, r => r.type === type && r.id === id)
+    const match = find(this._cache, r => r.type === type && r.id === id)
     return match && match.deserialized
   }
 
@@ -33,7 +23,7 @@ const cache = new class {
   }
 }
 
-function collection (items, included, useCache = false) {
+export function collection (items, included, useCache = false) {
   const collection = items.map(item => {
     return resource.call(this, item, included, useCache)
   })
@@ -43,7 +33,7 @@ function collection (items, included, useCache = false) {
   return collection
 }
 
-function resource (item, included, useCache = false) {
+export function resource (item, included, useCache = false) {
   if (useCache) {
     const cachedItem = cache.get(item.type, item.id)
     if (cachedItem) return cachedItem
@@ -54,15 +44,15 @@ function resource (item, included, useCache = false) {
 
   let deserializedModel = {id: item.id, type: item.type}
 
-  _forOwn(item.attributes, (value, attr) => {
+  forOwn(item.attributes, (value, attr) => {
     var attrConfig = model.attributes[attr]
 
-    if (_isUndefined(attrConfig) && attr !== 'id') {
+    if (isUndefined(attrConfig) && attr !== 'id') {
       const camelCaseAttr = attr.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase() })
       attrConfig = model.attributes[camelCaseAttr]
     }
 
-    if (_isUndefined(attrConfig) && attr !== 'id') {
+    if (isUndefined(attrConfig) && attr !== 'id') {
       Logger.warn(`Resource response for type "${item.type}" contains attribute "${attr}", but it is not present on model config and therefore not deserialized.`)
     } else {
       deserializedModel[attr] = value
@@ -72,16 +62,16 @@ function resource (item, included, useCache = false) {
   // Important: cache before parsing relationships to avoid infinite loop
   cache.set(item.type, item.id, deserializedModel)
 
-  _forOwn(item.relationships, (value, rel) => {
+  forOwn(item.relationships, (value, rel) => {
     var relConfig = model.attributes[rel]
     var key = rel
 
-    if (_isUndefined(relConfig)) {
+    if (isUndefined(relConfig)) {
       rel = rel.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase() })
       relConfig = model.attributes[rel]
     }
 
-    if (_isUndefined(relConfig)) {
+    if (isUndefined(relConfig)) {
       Logger.warn(`Resource response for type "${item.type}" contains relationship "${rel}", but it is not present on model config and therefore not deserialized.`)
     } else if (!isRelationship(relConfig)) {
       Logger.warn(`Resource response for type "${item.type}" contains relationship "${rel}", but it is present on model config as a plain attribute.`)
@@ -137,7 +127,7 @@ function attachHasManyFor (model, attribute, item, included, key) {
 }
 
 function isRelationship (attribute) {
-  return (_isPlainObject(attribute) && _includes(['hasOne', 'hasMany'], attribute.jsonApi))
+  return (isPlainObject(attribute) && includes(['hasOne', 'hasMany'], attribute.jsonApi))
 }
 
 /*
@@ -145,19 +135,19 @@ function isRelationship (attribute) {
  *   Returns unserialized related items.
  */
 function relatedItemsFor (model, attribute, item, included, key) {
-  let relationMap = _get(item.relationships, [key, 'data'], false)
+  let relationMap = get(item.relationships, [key, 'data'], false)
   if (!relationMap) {
     return []
   }
 
-  if (_isArray(relationMap)) {
-    return _flatten(_map(relationMap, function (relationMapItem) {
-      return _filter(included, (includedItem) => {
+  if (isArray(relationMap)) {
+    return flatten(map(relationMap, function (relationMapItem) {
+      return filter(included, (includedItem) => {
         return isRelatedItemFor(attribute, includedItem, relationMapItem)
       })
     }))
   } else {
-    return _filter(included, (includedItem) => {
+    return filter(included, (includedItem) => {
       return isRelatedItemFor(attribute, includedItem, relationMap)
     })
   }
@@ -166,7 +156,7 @@ function relatedItemsFor (model, attribute, item, included, key) {
 function isRelatedItemFor (attribute, relatedItem, relationMapItem) {
   let passesFilter = true
   if (attribute.filter) {
-    passesFilter = _matches(relatedItem.attributes, attribute.filter)
+    passesFilter = matches(relatedItem.attributes, attribute.filter)
   }
   return (
     relatedItem.id === relationMapItem.id &&
@@ -175,7 +165,7 @@ function isRelatedItemFor (attribute, relatedItem, relationMapItem) {
   )
 }
 
-module.exports = {
+export default {
   cache: cache,
   resource: resource,
   collection: collection

@@ -1,11 +1,10 @@
-const _isEmpty = require('lodash/isEmpty')
-const _assign = require('lodash/assign')
+import {isEmpty, assign} from 'lodash-es'
 
-module.exports = {
+export default {
   name: 'HEADER',
   req: (payload) => {
-    if (!_isEmpty(payload.jsonApi.headers)) {
-      payload.req.headers = _assign({}, payload.req.headers, payload.jsonApi.headers)
+    if (!isEmpty(payload.jsonApi.headers)) {
+      payload.req.headers = assign({}, payload.req.headers, payload.jsonApi.headers)
     }
     return payload
   }

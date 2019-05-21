@@ -1,6 +1,6 @@
-const serialize = require('./_serialize')
+import serialize from './_serialize'
 
-module.exports = {
+export default {
   name: 'POST',
   req: (payload) => {
     let jsonApi = payload.jsonApi

@@ -1,4 +1,4 @@
-const Logger = require('../../logger')
+import Logger from '../../logger'
 
 function buildErrors (serverErrors) {
   if (!serverErrors) {
@@ -25,7 +25,7 @@ function errorKey (index, source) {
   return source.pointer.split('/').pop()
 }
 
-module.exports = {
+export default {
   name: 'errors',
   error: function (payload) {
     if (payload.response) {

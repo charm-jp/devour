@@ -1,7 +1,4 @@
-const _isPlainObject = require('lodash/isPlainObject')
-const _includes = require('lodash/includes')
-const _map = require('lodash/map')
-const _forOwn = require('lodash/forOwn')
+import {isPlainObject, includes, map, forOwn} from 'lodash-es'
 
 function collection (modelName, items) {
   return items.map(item => {
@@ -20,7 +17,7 @@ function resource (modelName, item) {
   if (options.serializer) {
     return options.serializer.call(this, item)
   }
-  _forOwn(model.attributes, (value, key) => {
+  forOwn(model.attributes, (value, key) => {
     if (isReadOnly(key, readOnly)) {
       return
     }
@@ -64,7 +61,7 @@ function isReadOnly (attribute, readOnly) {
 }
 
 function isRelationship (attribute) {
-  return (_isPlainObject(attribute) && _includes(['hasOne', 'hasMany'], attribute.jsonApi))
+  return (isPlainObject(attribute) && includes(['hasOne', 'hasMany'], attribute.jsonApi))
 }
 
 function serializeRelationship (relationshipName, relationship, relationshipType, serializeRelationships) {
@@ -78,7 +75,7 @@ function serializeRelationship (relationshipName, relationship, relationshipType
 
 function serializeHasMany (relationships, type) {
   return {
-    data: _map(relationships, (item) => {
+    data: map(relationships, (item) => {
       return {id: item.id, type: type || item.type}
     })
   }
@@ -93,7 +90,7 @@ function serializeHasOne (relationship, type) {
   }
 }
 
-module.exports = {
+export default {
   resource: resource,
   collection: collection
 }
